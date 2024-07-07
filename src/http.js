@@ -13,11 +13,11 @@ export async function fetchMemories() {
 
 export async function fetchMemory(id) {
   const response = await fetch(`${BASE_URL}/memories/${id}`);
-  const resData = await response.json();
-
   if (!response.ok) {
     throw new Error('Failed to fetch places');
   }
 
-  return resData.memories;
+  const resData = await response.json();
+
+  return resData;
 }

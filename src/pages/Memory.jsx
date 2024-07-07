@@ -1,36 +1,28 @@
 import { useParams } from "react-router";
 import { useFetch } from "../hooks/useFetch";
-import { BASE_URL, fetchMemory } from "../http";
-import { useEffect, useState } from "react";
+import { fetchMemory } from "../http";
+import MemoryFragment from "../components/MemoryFragment";
 
 export default function MemoryPage() {
     const params = useParams();
-    const [fetchedData, setFetchedData] = useState({});
 
-    useEffect( async () => {
-        async function fetchMemory(id) {
-            const response = await fetch(`${BASE_URL}/memories/${id}`);
-            const resData = await response.json();
-          
-            if (!response.ok) {
-              throw new Error('Failed to fetch places');
-            }
+    const { isFetching, fetchedData, error, setFetchedData } = useFetch(() => fetchMemory(params.memoryId), []);
 
-            return resData.memories;
-        }
-
-        const data = await fetchMemory(params.memoryId);
-        // setFetchedData(data);
-    }, []);
-
-    // const { isFetching, fetchedData, error, setFetchedData } = useFetch(() => fetchMemory(params.memoryId), []);
-    // console.log(fetchedData);
+    if (isFetching) {
+        return <p>Fetching data...</p>
+    }
 
     return (
         <>
             <h1>Memory {params.memoryId}</h1>
             {fetchedData && <div>
-                <p>{fetchedData.source}</p>
+                <p>Source: {fetchedData.source}</p>
+                <p>Type: {fetchedData.memoryType}</p>
+                <div>Created at: {fetchedData.createdAt}</div>
+                <div>Updated at: {fetchedData.updatedAt}</div>
+                {fetchedData.fragments && <ul>
+                    {fetchedData.fragments.map(fragment => <MemoryFragment key={fragment.id} fragment={fragment}></MemoryFragment>)}
+                </ul>}
             </div>}
         </>
     );
